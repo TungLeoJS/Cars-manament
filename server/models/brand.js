@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const schemaOptions = require('./schemaOptions');
 
 const BrandSchema = mongoose.Schema(
     {
@@ -15,7 +16,8 @@ const BrandSchema = mongoose.Schema(
     },
     {
         timestamp: true,
-    }
+    },
+    schemaOptions
 );
 
 module.exports = mongoose.model('Brand', BrandSchema);

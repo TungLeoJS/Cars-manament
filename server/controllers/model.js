@@ -1,10 +1,11 @@
+const Brand = require('../models/brand');
 const Model = require('../models/model');
 
 exports.create = async (req, res) => {
     try {
-        const { brandId, name, color, image } = req.body;
+        const { brand, name, color, image } = req.body;
         const model = await Model.create({
-            brandId,
+            brand,
             name,
             color,
             image,
@@ -12,6 +13,7 @@ exports.create = async (req, res) => {
 
         res.status(201).json(model);
     } catch (err) {
+        console.log(err);
         res.status(500).json(err);
     }
 };
@@ -45,10 +47,64 @@ exports.delete = async (req, res) => {
 
 exports.getAll = async (req, res) => {
     try {
-        const model = await Model.find({});
+        const qBrandName = req.query.brandName;
+        const searchText = req.query.searchText;
+        let model;
+
+        if (qBrandName) {
+            model = await Model.find()
+                .select('name brand')
+                .populate({
+                    path: 'brand',
+                    model: 'Brand',
+                    match: {
+                        name: {
+                            $regex: new RegExp(qBrandName, 'i'),
+                        },
+                    },
+                });
+
+            model = model.filter((item) => item.brand !== null);
+        } else if (searchText) {
+            const brandIds = await Brand.find({
+                name: { $regex: `/.*${searchText}.*/`, $options: 'i' },
+            })
+                .select('_id')
+                .lean();
+
+            model = await Model.find({
+                $or: [
+                    {
+                        name: {
+                            $regex: searchText,
+                        },
+                    },
+                    {
+                        color: {
+                            $regex: searchText,
+                        },
+                    },
+                    {
+                        desc: {
+                            $regex: searchText,
+                        },
+                    },
+                    {
+                        brand: {
+                            $in: brandIds,
+                        },
+                    },
+                ],
+            })
+                .populate('brand')
+                .lean();
+        } else {
+            model = await Model.find();
+        }
 
         res.status(200).json(model);
     } catch (err) {
+        console.log(err);
         res.status(500).json(err);
     }
 };

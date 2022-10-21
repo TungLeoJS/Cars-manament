@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
+const schemaOptions = require('./schemaOptions');
+const Schema = mongoose.Schema;
 
 const ModelSchema = mongoose.Schema(
     {
-        brandId: {
-            type: String,
+        brand: {
+            type: Schema.Types.ObjectId,
+            ref: 'Brand',
             required: true,
         },
         name: {
@@ -22,7 +25,8 @@ const ModelSchema = mongoose.Schema(
     },
     {
         timestamp: true,
-    }
+    },
+    schemaOptions
 );
 
 module.exports = mongoose.model('Model', ModelSchema);
