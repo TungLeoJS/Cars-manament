@@ -1,0 +1,196 @@
+@import 'commonStyles/mixins';
+@import 'commonStyles/variables';
+
+.brand-list {
+    padding: 2rem 1.5rem;
+
+    &__header {
+        @include flex($justify: space-between);
+        margin-bottom: 2rem;
+
+        .header__left {
+            @include flex($align: center);
+
+            &__title {
+                color: $primary-dark-1;
+                font-size: 1.5rem;
+                margin-right: 1.5rem;
+                font-weight: 600;
+            }
+
+            &__filter {
+                select {
+                    margin-left: 5px;
+                    padding: 5px;
+                    font-size: 0.75rem;
+                    font-weight: 500;
+                    -moz-appearance: none !important;
+                    -webkit-appearance: none !important;
+                    appearance: none !important;
+                    border: none;
+                    pointer-events: none;
+                }
+            }
+
+            &__search-input {
+                margin-left: 20px;
+                padding: 0.5rem;
+                background-color: #f1f1f1;
+                border-radius: 50px;
+
+                i {
+                    margin-right: 5px;
+                }
+
+                input {
+                    border: none;
+                    background: none;
+                    outline: none;
+                }
+            }
+        }
+    }
+
+    &__main {
+        @include flex($direction: column);
+        width: 100%;
+
+        &__item {
+            width: 90%;
+            @include flex($align: center);
+            padding: 2rem 1rem;
+            border-bottom: 1px solid #f1f1f1;
+
+            .item {
+                &-select {
+                    @include flex($justify: space-between, $align: center);
+                    flex: 0 0 10%;
+                    border-right: 1px solid #0fc97b;
+                    padding-right: 2.5rem;
+
+                    input {
+                        margin-right: 2.5rem;
+                        -ms-transform: scale(1.5);
+                        -webkit-transform: scale(1.5);
+                        transform: scale(1.5);
+                    }
+                }
+            }
+
+            .item-details {
+                padding-left: 2.5rem;
+                @include flex($justify: space-between, $align: center);
+                flex: 0 0 70%;
+
+                &__info {
+                    @include flex($direction: column);
+                    flex: 2;
+
+                    &__brand-name {
+                        font-size: 1.5rem;
+                        line-height: 2rem;
+                        color: $primary-dark-1;
+                    }
+
+                    &__description {
+                        span {
+                            display: inline-block;
+                            font-size: 0.75rem;
+
+                            &:nth-child(1) {
+                                color: #8c8c8c;
+                                padding-right: 1rem;
+                                border-right: 1px solid #e3e3e3;
+                                display: inline-block;
+                                max-width: 250px;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+
+                            &:nth-child(2) {
+                                color: $primary;
+                                padding-left: 1rem;
+                                border-left: 1px solid #e3e3e3;
+                            }
+                        }
+                    }
+                }
+
+                &__updated-time {
+                    @include flex($direction: column, $justify: space-between);
+                    flex: 1;
+                    font-size: 0.75rem;
+                    line-height: 22px;
+
+                    &__text {
+                        color: $primary-dark-1;
+                    }
+
+                    &__date-time {
+                        font-size: #8c8c8c;
+                    }
+                }
+
+                &__status {
+                    flex: 1;
+                    font-weight: 500;
+                    @include flex($align: center);
+
+                    &--active {
+                        color: #0fc97b;
+
+                        .item-details__status-signal {
+                            background-color: #0fc97b;
+                        }
+                    }
+
+                    &--inactive {
+                        color: #5f5f5f;
+                        
+                        .item-details__status-signal {
+                            background-color: #5f5f5f;
+                        }
+                    }
+                    
+                    &-signal {
+                        width: 1rem;
+                        height: 1rem;
+                        border-radius: 50%;
+                        display: inline-block;
+                        margin-right: 10px;
+                    }
+                }
+            }
+        }
+    }
+
+    &__add {
+        color: #fff;
+    }
+
+    .button {
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 4px;
+        max-width: 200px;
+        border: 1px solid #b4b4b4;
+        font-weight: 500;
+
+        i {
+            margin-right: 10px;
+        }
+
+        &--primary {
+            background-color: $primary;
+        }
+
+        &--secondary {
+            background-color: #fff;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
