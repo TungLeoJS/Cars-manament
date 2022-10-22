@@ -3,12 +3,14 @@ const Brand = require('../models/brand');
 
 exports.create = async (req, res) => {
     try {
-        const { name, desc, logo } = req.body;
+        const { name, desc, logo, isActive } = req.body;
         const brand = await Brand.create({
             name,
             logo,
             desc,
+            isActive
         });
+        brand.save();
 
         res.status(201).json(brand);
     } catch (err) {
@@ -25,10 +27,10 @@ exports.update = async (req, res) => {
             },
             { new: true }
         );
+        updatedBrand.update();
 
         res.status(200).json(updatedBrand);
     } catch (err) {
-        console.log(err);
         res.status(500).json(err);
     }
 };
@@ -56,7 +58,7 @@ exports.getAll = async (req, res) => {
                 },
             });
         } else {
-            brand = await Brand.find();
+            brand = await Brand.find().populate('model').lean();
         }
 
         res.status(200).json(brand);
@@ -78,11 +80,9 @@ exports.getById = async (req, res) => {
 exports.getModelById = async (req, res) => {
     try {
         const model = await Model.find({ brandId: req.params.id });
-        console.log(model);
 
         res.status(200).json(model);
     } catch (err) {
-        console.log(err);
         res.status(500).json(err);
     }
 };

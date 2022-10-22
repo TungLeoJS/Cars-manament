@@ -13,11 +13,20 @@ const BrandSchema = mongoose.Schema(
         logo: {
             type: String,
         },
+        isActive: {
+            type: Boolean,
+        }
     },
     {
-        timestamp: true,
+        timestamps: true,
     },
     schemaOptions
 );
+
+BrandSchema.virtual('model', {
+    ref: 'Model',
+    localField: '_id',
+    foreignField: 'brand',
+})
 
 module.exports = mongoose.model('Brand', BrandSchema);

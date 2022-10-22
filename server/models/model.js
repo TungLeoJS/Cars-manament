@@ -24,7 +24,7 @@ const ModelSchema = mongoose.Schema(
         },
     },
     {
-        timestamp: true,
+        timestamps: true,
     },
     schemaOptions
 );

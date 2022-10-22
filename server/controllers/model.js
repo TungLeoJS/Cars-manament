@@ -10,10 +10,10 @@ exports.create = async (req, res) => {
             color,
             image,
         });
+        model.save();
 
         res.status(201).json(model);
     } catch (err) {
-        console.log(err);
         res.status(500).json(err);
     }
 };
@@ -27,10 +27,10 @@ exports.update = async (req, res) => {
             },
             { new: true }
         );
+        updatedModel.update();
 
         res.status(200).json(updatedModel);
     } catch (err) {
-        console.log(err);
         res.status(500).json(err);
     }
 };
@@ -104,7 +104,6 @@ exports.getAll = async (req, res) => {
 
         res.status(200).json(model);
     } catch (err) {
-        console.log(err);
         res.status(500).json(err);
     }
 };
