@@ -134,17 +134,25 @@ const Modal = ({
             {brandDetails?.logo ? (
               <div className='brand-logo__images'>
                 <img src={brandDetails.logo} alt='brand-logo' />
+                <input
+                  id='logo'
+                  name='logo'
+                  className='inputFile'
+                  type='file'
+                  onChange={(e) => onChangeFileUpload(e)}
+                />
+                <label htmlFor='logo'>Upload file</label>
               </div>
             ) : (
               <div className='brand-logo__add'>
+                <i className='fa-solid fa-plus'></i>
+                <span>Brand Logo</span>
                 <input
                   name='logo'
                   className='inputFile'
                   type='file'
                   onChange={(e) => onChangeFileUpload(e)}
                 />
-                <i className='fa-solid fa-plus'></i>
-                <span>Brand Logo</span>
               </div>
             )}
           </div>
