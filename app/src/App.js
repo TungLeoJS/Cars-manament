@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import BrandList from './pages/BrandList';
 import Layout from './components/Layout/Layout';
+import BrandDetails from './pages/BrandDetails';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                         element={<Navigate to='/brand' />}
                     ></Route>
                     <Route path='/brand' element={<BrandList />}></Route>
+                    <Route path='/brand/:id' element={<BrandDetails />} />
                 </Route>
             </Routes>
         </Router>

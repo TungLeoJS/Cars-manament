@@ -137,7 +137,9 @@ const Modal = ({
                     <div className='brand-logo'>
                         <div className='brand-logo__title'>Brand Logo</div>
                         {brandDetails?.logo ? (
-                            <img src={brandDetails.logo} alt='brand-logo' />
+                            <div className='brand-logo__images'>
+                                <img src={brandDetails.logo} alt='brand-logo' />
+                            </div>
                         ) : (
                             <div className='brand-logo__add'>
                                 <input

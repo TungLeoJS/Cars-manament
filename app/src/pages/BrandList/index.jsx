@@ -4,6 +4,8 @@ import Backdrop from '../../components/Backdrop/Backdrop';
 import debounce from 'lodash.debounce';
 import { useRef } from 'react';
 import Modal from '../../components/Modal/Modal';
+import { useNavigate } from 'react-router-dom';
+import noLogo from 'assets/images/brandLogos/no-logo.png'
 
 import './styles.scss';
 
@@ -16,6 +18,7 @@ const BrandList = () => {
     const [isDelete, setIsDelete] = useState(false);
     const [brandDetails, setBrandDetails] = useState(null);
     const inputRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchData();
@@ -54,7 +57,6 @@ const BrandList = () => {
     };
 
     const onChangeLogo = (downloadUrl) => {
-        console.log(downloadUrl);
         const { name, value } = downloadUrl;
         setBrandDetails({ ...brandDetails, [name]: value });
     };
@@ -91,7 +93,6 @@ const BrandList = () => {
                     brandData
                 );
             } else if (isDelete) {
-                console.log('delete', brandDetails._id);
                 await publicRequest.delete(`/brand/${brandDetails._id}`);
             } else {
                 await publicRequest.post('/brand', brandData);
@@ -110,7 +111,6 @@ const BrandList = () => {
 
     const onOpenModal = (id, type) => {
         const brandDetails = brandList.find((item) => item._id === id);
-        console.log(brandDetails);
 
         if (brandDetails) {
             setBrandDetails(brandDetails);
@@ -120,6 +120,12 @@ const BrandList = () => {
             setIsModalOpen(true);
         }
     };
+
+    const goToDetails = (id) => {
+        if(id) {
+            navigate(`/brand/${id}`);
+        }
+    }
 
     return (
         <>
@@ -168,10 +174,12 @@ const BrandList = () => {
                             >
                                 <div className='item-select'>
                                     <input type='radio' />
+                                    <div className='item__logo'>
                                     <img
-                                        src={item.logo || ''}
+                                        src={item.logo || noLogo}
                                         alt='brand-logo'
                                     />
+                                    </div>
                                 </div>
                                 <div className='item-details'>
                                     <div className='item-details__info'>
@@ -210,7 +218,7 @@ const BrandList = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className='item-view-details button button--secondary'>
+                                <div onClick={() => goToDetails(item._id)} className='item-view-details button button--secondary'>
                                     View Details
                                 </div>
                                 <div
