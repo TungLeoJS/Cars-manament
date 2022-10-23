@@ -59,10 +59,11 @@ exports.getAll = async (req, res) => {
                     model: 'Brand',
                     match: {
                         name: {
-                            $regex: new RegExp(qBrandName, 'i'),
+                            $regex: qBrandName,
+                            $options: 'i'
                         },
                     },
-                });
+                }).lean();
 
             model = model.filter((item) => item.brand !== null);
         } else if (searchText) {
