@@ -75,6 +75,10 @@
                         transform: scale(1.5);
                     }
                 }
+
+                &-view-details, &-edit {
+                    margin-right: 20px;
+                }
             }
 
             .item-details {
@@ -147,12 +151,12 @@
 
                     &--inactive {
                         color: #5f5f5f;
-                        
+
                         .item-details__status-signal {
                             background-color: #5f5f5f;
                         }
                     }
-                    
+
                     &-signal {
                         width: 1rem;
                         height: 1rem;
@@ -183,14 +187,22 @@
 
         &--primary {
             background-color: $primary;
+            color: #fff;
         }
 
         &--secondary {
             background-color: #fff;
+            color: #000;
+        }
+
+        &--delete {
+            background-color: rgba(194, 65, 22, 0.952);
+            color: #fff;
         }
 
         &:hover {
             cursor: pointer;
+            opacity: 0.5;
         }
     }
 }

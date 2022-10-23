@@ -1,4 +1,3 @@
-import brandLogo from 'assets/images/brandLogos/toyota.png';
 import { useState, useEffect, useCallback } from 'react';
 import { publicRequest } from 'api/publicRequest';
 import Backdrop from '../../components/Backdrop/Backdrop';
@@ -13,6 +12,9 @@ const BrandList = () => {
     const [searchText, setSearchText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
+    const [brandDetails, setBrandDetails] = useState(null);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -42,15 +44,23 @@ const BrandList = () => {
     };
 
     const onChangeHandler = (e) => {
-        if (e) {
-            setSearchText(e.target.value);
+        const { name, value } = e.target;
+
+        if (e.target.name === 'search') {
+            setSearchText(value);
         }
+
+        setBrandDetails({ ...brandDetails, [name]: value });
     };
 
-    const debouncedChangeHandler = useCallback(
-        debounce(onChangeHandler, 300),
-        []
-    );
+    const onChangeLogo = (downloadUrl) => {
+        console.log(downloadUrl);
+        const { name, value } = downloadUrl;
+        setBrandDetails({ ...brandDetails, [name]: value });
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const debouncedChangeHandler = useCallback(() => debounce(onChangeHandler, 300), [brandDetails]);
 
     const onSearchHandler = async (e) => {
         e.preventDefault();
@@ -58,30 +68,56 @@ const BrandList = () => {
         inputRef.current.value = '';
     };
 
-    const onOpenModal = () => {
-        setIsModalOpen(true);
-    };
-
     const onCloseModal = () => {
+        setBrandDetails(null);
         setIsModalOpen(false);
+        setIsEdit(false);
+        setIsDelete(false);
     };
 
-    const onCreateBrand = async (data) => {
+    const onSubmit = async () => {
         try {
             setIsLoading(true);
-            const { name, status, desc, logo } = data;
+            const { name, isActive, desc, logo } = brandDetails;
             const brandData = {
                 logo,
                 name,
-                isActive: status === 'true' ? true : false,
+                isActive,
                 desc,
             };
-            await publicRequest.post('/brand', brandData);
+            if (isEdit) {
+                await publicRequest.put(
+                    `/brand/${brandDetails._id}`,
+                    brandData
+                );
+            } else if (isDelete) {
+                console.log('delete', brandDetails._id);
+                await publicRequest.delete(`/brand/${brandDetails._id}`);
+            } else {
+                await publicRequest.post('/brand', brandData);
+            }
             await fetchData();
+
+            setBrandDetails(null);
+            setIsModalOpen(false);
+            setIsEdit(false);
         } catch (error) {
             throw error;
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const onOpenModal = (id, type) => {
+        const brandDetails = brandList.find((item) => item._id === id);
+        console.log(brandDetails);
+
+        if (brandDetails) {
+            setBrandDetails(brandDetails);
+            setIsModalOpen(true);
+            type === 'edit' ? setIsEdit(true) : setIsDelete(true);
+        } else {
+            setIsModalOpen(true);
         }
     };
 
@@ -108,6 +144,7 @@ const BrandList = () => {
                         >
                             <i className='fa-solid fa-magnifying-glass'></i>
                             <input
+                                name='search'
                                 ref={inputRef}
                                 onChange={debouncedChangeHandler}
                                 placeholder='Search car brand'
@@ -115,7 +152,7 @@ const BrandList = () => {
                         </form>
                     </div>
                     <button
-                        onClick={onOpenModal}
+                        onClick={() => onOpenModal()}
                         className='brand-list__add button button--primary'
                     >
                         <i className='fa-solid fa-plus'></i>
@@ -131,7 +168,10 @@ const BrandList = () => {
                             >
                                 <div className='item-select'>
                                     <input type='radio' />
-                                    <img src={brandLogo} alt='' />
+                                    <img
+                                        src={item.logo || ''}
+                                        alt='brand-logo'
+                                    />
                                 </div>
                                 <div className='item-details'>
                                     <div className='item-details__info'>
@@ -173,6 +213,22 @@ const BrandList = () => {
                                 <div className='item-view-details button button--secondary'>
                                     View Details
                                 </div>
+                                <div
+                                    onClick={() =>
+                                        onOpenModal(item._id, 'edit')
+                                    }
+                                    className='item-edit button button--primary'
+                                >
+                                    Edit
+                                </div>
+                                <div
+                                    onClick={() =>
+                                        onOpenModal(item._id, 'delete')
+                                    }
+                                    className='item-delete button button--delete'
+                                >
+                                    Delete
+                                </div>
                             </div>
                         ))}
                 </div>
@@ -181,7 +237,12 @@ const BrandList = () => {
             <Modal
                 isModalOpen={isModalOpen}
                 onClose={onCloseModal}
-                onCreateBrand={onCreateBrand}
+                onSubmit={onSubmit}
+                isEdit={isEdit}
+                isDelete={isDelete}
+                brandDetails={brandDetails}
+                debouncedChangeHandler={debouncedChangeHandler}
+                onChangeLogo={onChangeLogo}
             />
         </>
     );

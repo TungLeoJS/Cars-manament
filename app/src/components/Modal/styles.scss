@@ -59,6 +59,18 @@
             }
 
             &__add {
+                .inputFile {
+                    width: 7.5rem;
+                    height: 7.5rem;
+                    opacity: 0;
+                    overflow: hidden;
+                    position: absolute;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+
                 background-color: #e3e3e3;
                 border-radius: 50%;
                 width: 7.5rem;
@@ -80,8 +92,8 @@
                 }
 
                 &:hover {
-                    cursor: pointer;
-                    opacity: 0.5;
+                    // cursor: pointer;
+                    // opacity: 0.5;
                 }
             }
         }
@@ -135,7 +147,7 @@
             }
         }
 
-        .brand-actions {
+        .modal-actions {
             margin-top: 2rem;
             @include flex($align: center, $justify: flex-end);
 
@@ -185,5 +197,30 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+
+    &--delete {
+        .modal {
+            &-container {
+                width: 400px;
+                height: 250px;
+            }
+
+            &-actions {
+                justify-content: space-evenly;
+
+                .button {
+                    min-width: 100px;
+                }
+            }
+
+            &-main {
+                .modal-message {
+                    .brand-name-text {
+                        font-weight: 600;
+                    }
+                }
+            }
+        }
     }
 }
