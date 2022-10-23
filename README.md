@@ -7,8 +7,9 @@ I have been using these things to handle:
 + Eslint + prettier for cleaning code.
 + Docker.
 
+API collection is included in repository
 
-Pull the source code.
+Step to run the source code:
 
 Client:
   cd app
@@ -24,9 +25,10 @@ Server:
 
   npm run start / yarn start
 
-Or you can use docker to start:
+Or you can use docker to start by running command at root folder:
 
 docker-compose up
+
 Client: localhost:3000
 Backend: localhost:5000
 
