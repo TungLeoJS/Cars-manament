@@ -19,10 +19,10 @@ const Modal = ({
   onChangeLogo,
   isDelete,
 }) => {
-  const inputNameRef = useRef(null);
-  const inputDescRef = useRef(null);
-  const inputStatusRef = useRef(null);
-  const logoRef = useRef(null);
+  const inputNameRef = useRef({ value: '' });
+  const inputDescRef = useRef({ value: '' });
+  const inputStatusRef = useRef({ value: '' });
+  const logoRef = useRef({ value: '' });
 
   useEffect(() => {
     if (brandDetails) {
@@ -117,8 +117,12 @@ const Modal = ({
       <>
         <div className='modal-header'>
           <div className='modal-header__left'>
-            <div className='modal-header__title'>Add Car Brand</div>
-            <div className='modal-header__subtitle'>Setup new car brand</div>
+            <div className='modal-header__title'>
+              {isEdit ? 'Update' : 'Add'} Car Brand
+            </div>
+            <div className='modal-header__subtitle'>
+              {isEdit ? 'Update' : 'Setup new '} car brand
+            </div>
           </div>
           <div onClick={onClose} className='modal-header__close-button'>
             <i className='fa-solid fa-xmark'></i>

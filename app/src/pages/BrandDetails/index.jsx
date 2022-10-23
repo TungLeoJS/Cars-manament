@@ -59,7 +59,7 @@ const BrandDetails = () => {
           <div className='info__name-and-status'>
             <div className='info__name'>
               <div className='name__title'>Brand Name</div>
-              <div className='name__text bold'>{details.name || ''}</div>
+              <div className='name__text bold'>{details.name || '--'}</div>
             </div>
             <div className='info__status'>
               <div className='status__title'>Brand Status</div>
@@ -75,7 +75,7 @@ const BrandDetails = () => {
           </div>
           <div className='info__desc'>
             <div className='desc__title'>Brand Description</div>
-            <div className='desc__text bold'>{details.desc || ''}</div>
+            <div className='desc__text bold'>{details.desc || '--'}</div>
           </div>
         </div>
       </div>

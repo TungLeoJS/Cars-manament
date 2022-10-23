@@ -29,6 +29,7 @@ const BrandList = () => {
         const { data } = list;
         setBrandList(data);
         setSearchText('');
+        setIsLoading(false);
       }
     } catch (err) {
       setIsLoading(false);
@@ -58,10 +59,9 @@ const BrandList = () => {
     setBrandDetails({ ...brandDetails, [name]: value });
   };
 
-  const debouncedChangeHandler = useCallback(
-    () => debounce(onChangeHandler, 300),
-    [brandDetails]
-  );
+  const debouncedChangeHandler = useCallback(debounce(onChangeHandler, 300), [
+    brandDetails,
+  ]);
 
   const onSearchHandler = async (e) => {
     e.preventDefault();
