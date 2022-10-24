@@ -6,13 +6,13 @@ import { initializeApp } from 'firebase/app';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: 'AIzaSyBlsEgWcg5teWaxh9g7jrCv9If1VYuoACo',
-  authDomain: 'fetch-cars-management.firebaseapp.com',
-  projectId: 'fetch-cars-management',
-  storageBucket: 'fetch-cars-management.appspot.com',
-  messagingSenderId: '96597308595',
-  appId: '1:96597308595:web:fba5eb75bac5e20398ecc6',
-  measurementId: 'G-0ZCJKHHSN1',
+  apiKey: 'AIzaSyAgRafx2BZuIcZMZ-rg6G5aBUzh-oOaYCc',
+  authDomain: 'cars-management-2.firebaseapp.com',
+  projectId: 'cars-management-2',
+  storageBucket: 'cars-management-2.appspot.com',
+  messagingSenderId: '542931262886',
+  appId: '1:542931262886:web:b0f6daab237f7c46364367',
+  measurementId: 'G-C3MGJ1P5B7',
 };
 
 // Initialize Firebase
