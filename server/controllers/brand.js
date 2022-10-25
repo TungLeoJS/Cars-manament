@@ -1,5 +1,6 @@
 const Model = require('../models/model');
 const Brand = require('../models/brand');
+const mongoose = require('mongoose');
 
 exports.create = async (req, res) => {
     try {
@@ -8,7 +9,7 @@ exports.create = async (req, res) => {
             name,
             logo,
             desc,
-            isActive
+            isActive,
         });
         brand.save();
 
@@ -47,21 +48,45 @@ exports.delete = async (req, res) => {
 
 exports.getAll = async (req, res) => {
     try {
-        const qName = req.query.name;
+        const { name: qName, lastIndexId, limit: qLimit } = req.query;
         let brand;
 
-        if (qName) {
-            brand = await Brand.find({
-                name: {
-                    $regex: qName,
-                    $options: 'i',
-                },
-            });
+        const id =
+            Number(lastIndexId) !== -1
+                ? new mongoose.Types.ObjectId(lastIndexId)
+                : Number(lastIndexId);
+
+        if (Number(lastIndexId) === -1) {
+            if (qName) {
+                brand = await Brand.find({
+                    name: { $regex: qName, $options: 'i' },
+                }).limit(qLimit || 0);
+            } else {
+                brand = await Brand.find().limit(qLimit || 0);
+            }
         } else {
-            brand = await Brand.find().populate('model').lean();
+            if (qName) {
+                brand = await Brand.find({
+                    name: { $regex: qName, $options: 'i' },
+                    _id: { $gt: id },
+                }).limit(qLimit || 0);
+            } else {
+                brand = await Brand.find({
+                    _id: { $gt: id },
+                })
+                    .limit(qLimit || 0)
+                    .populate('model')
+                    .lean();
+            }
         }
 
-        res.status(200).json(brand);
+        const lastItem = await Brand.findOne({}, {}, { sort: { createdAt: -1 } });
+        const isNextPageExist = lastIndexId !== lastItem._id.toString()
+
+        res.status(200).json({
+            list: brand,
+            isNextPageExist,
+        });
     } catch (err) {
         res.status(500).json(err);
     }
