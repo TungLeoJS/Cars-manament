@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ucarLogo from 'assets/images/brandLogos/UCARS-logo.png';
+import ucarLogo from 'src/assets/images/brandLogos/UCARS-logo.png';
 
 import './styles.scss';
 

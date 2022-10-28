@@ -1,11 +1,20 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { publicRequest } from 'api/publicRequest';
-import Backdrop from '../../components/Backdrop/Backdrop';
-import debounce from 'lodash.debounce';
-import Modal from '../../components/Modal/Modal';
+import { publicRequest } from 'src/api/publicRequest';
+import Backdrop from 'components/Backdrop/Backdrop';
+import debounce from 'lodash/debounce';
+import Modal from 'components/Modal/Modal';
 import { useNavigate } from 'react-router-dom';
-import noLogo from 'assets/images/brandLogos/no-logo.png';
+import noLogo from 'src/assets/images/brandLogos/no-logo.png';
 import LoadingSpinner from 'components/LoadingSpinner';
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from 'firebase/storage';
+import app from 'src/firebase';
+import { uuidv4 } from '@firebase/util';
 
 import './styles.scss';
 
@@ -27,7 +36,8 @@ const BrandList = () => {
 
   const navigate = useNavigate();
   const inputRef = useRef(null);
-  const observe = useRef(null);
+  const observerItem = useRef(null);
+  const observerImage = useRef(null);
 
   const loadBrandList = async (params = {}) => {
     try {
@@ -47,13 +57,7 @@ const BrandList = () => {
       if (result) {
         const { data } = result;
         const prevList = isLoadMore ? brandList : [];
-        const { list, isNextPageExist } = data;
-        const lastIndex = isNextPageExist
-          ? list.length - 1
-          : brandList.length - 1;
-        const lastIndexId = isNextPageExist
-          ? list[lastIndex]._id
-          : brandList[lastIndex]._id;
+        const { list, isNextPageExist, lastIndexId } = data;
 
         setBrandList([...prevList, ...list]);
         setPageSettings({
@@ -78,7 +82,8 @@ const BrandList = () => {
   useEffect(() => {
     loadBrandList();
     return () => {
-      observe.current = null;
+      observerItem.current = null;
+      observerImage.current = null;
       inputRef.current = null;
     };
   }, []);
@@ -93,11 +98,6 @@ const BrandList = () => {
     if (e.target.name === 'search') {
       setSearchText(value);
     }
-    setBrandDetails({ ...brandDetails, [name]: value });
-  };
-
-  const onChangeLogo = (downloadUrl) => {
-    const { name, value } = downloadUrl;
     setBrandDetails({ ...brandDetails, [name]: value });
   };
 
@@ -119,10 +119,48 @@ const BrandList = () => {
     setIsDelete(false);
   };
 
-  const onSubmit = async () => {
+  const uploadFile = async (file, imageUrl, id) => {
+    try {
+      if (!file) {
+        return;
+      }
+      const storage = getStorage(app);
+      const imageId = id || uuidv4();
+      const imageStorageRef = imageUrl
+        ? ref(storage, imageUrl)
+        : ref(storage, imageId);
+      const downloadImageRef = ref(storage, imageStorageRef);
+      const uploadTask = await uploadBytes(imageStorageRef, file);
+      const downloadUrl = await getDownloadURL(downloadImageRef, (url) => {
+        return url;
+      });
+
+      if (uploadTask && downloadUrl) {
+        return downloadUrl;
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const deleteFile = (imageUrl) => {
+    try {
+      if (!imageUrl) {
+        return;
+      }
+
+      const storage = getStorage(app);
+      const imageStorageRef = ref(storage, imageUrl);
+      deleteObject(imageStorageRef);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const onSubmit = async (file) => {
     try {
       setIsLoading(true);
-      const { name, isActive, desc, logo } = brandDetails;
+      const { name, isActive, desc, logo, _id } = brandDetails;
       const brandData = {
         logo,
         name,
@@ -131,13 +169,19 @@ const BrandList = () => {
       };
       let list = [...brandList];
       if (isEdit) {
-        const result = await publicRequest.put(
-          `/brand/${brandDetails._id}`,
-          brandData
+        const idx = list.findIndex((item) => item._id === _id);
+        const downloadUrl = await uploadFile(
+          file,
+          list[idx].logo,
+          list[idx]._id
         );
+        const result = await publicRequest.put(`/brand/${brandDetails._id}`, {
+          ...brandData,
+          logo: downloadUrl,
+        });
         if (result.status === 200) {
           const { data } = result;
-          const idx = list.findIndex((item) => item._id === data._id);
+
           if (idx !== -1) {
             list[idx] = data;
           }
@@ -145,11 +189,16 @@ const BrandList = () => {
       } else if (isDelete) {
         const result = await publicRequest.delete(`/brand/${brandDetails._id}`);
         if (result.status === 200) {
+          deleteFile(brandDetails?.logo);
           const newList = list.filter((item) => item._id !== brandDetails._id);
           list = [...newList];
         }
       } else {
-        const result = await publicRequest.post('/brand', brandData);
+        const downloadUrl = await uploadFile(file);
+        const result = await publicRequest.post('/brand', {
+          ...brandData,
+          logo: downloadUrl,
+        });
         if (result.status === 201) {
           const { data } = result;
           list.push(data);
@@ -160,6 +209,7 @@ const BrandList = () => {
       setBrandDetails(null);
       setIsModalOpen(false);
       setIsEdit(false);
+      setIsDelete(false);
       setIsLoading(false);
     } catch (error) {
       throw error;
@@ -168,31 +218,32 @@ const BrandList = () => {
     }
   };
 
-  const lastIndexRef = (node) => {
+  const onLoadMore = async (entries) => {
     if (isFetchMore) {
       return;
     }
 
-    if (observe.current) {
+    const observed = entries[0];
+    const shouldLoadMore = observed.isIntersecting && isNextPageExist;
+
+    if (shouldLoadMore) {
+      setIsFetchMore(true);
+      await loadBrandList({ isLoadMore: true });
+      setTimeout(() => {
+        setIsFetchMore(false);
+      }, 1000);
+    }
+    return;
+  };
+
+  const observerEvent = (node, callback, observe, threshold) => {
+    if (observe.current && node?.tagName !== 'IMG') {
       observe.current.disconnect();
     }
 
     observe.current = new IntersectionObserver(
-      async (entries) => {
-        const observed = entries[0];
-
-        const shouldLoadMore = observed.isIntersecting && isNextPageExist;
-
-        if (shouldLoadMore) {
-          setIsFetchMore(true);
-          await loadBrandList({ isLoadMore: true });
-          setTimeout(() => {
-            setIsFetchMore(false);
-          }, 1000);
-        }
-        return;
-      },
-      { rootMargin: '0px 0px -160px 0px' }
+      async (entries) => callback(entries),
+      threshold
     );
 
     if (node) {
@@ -200,21 +251,12 @@ const BrandList = () => {
     }
   };
 
-  const imagesObserveRef = (node) => {
-    if (node) {
-      const observed = new IntersectionObserver(
-        (entries) => {
-          const element = entries[0];
+  const lazyLoadImage = (entries) => {
+    const element = entries[0];
 
-          if (element.isIntersecting) {
-            element.target.src = element.target.dataset.src;
-            element.target.removeAttribute('data-src');
-          }
-        },
-        { rootMargin: '0px 0px 160px 0px' }
-      );
-
-      observed.observe(node);
+    if (element.isIntersecting && element.target.dataset.src) {
+      element.target.src = element.target.dataset.src;
+      element.target.removeAttribute('data-src');
     }
   };
 
@@ -276,17 +318,26 @@ const BrandList = () => {
           {brandList.length > 0 &&
             brandList.map((item, index) => (
               <div
-                data-id={item._id}
                 className='brand-list__main__item'
                 key={item._id}
-                ref={brandList.length - 1 === index ? lastIndexRef : null}
+                ref={
+                  brandList.length - 1 === index
+                    ? (e) =>
+                        observerEvent(e, onLoadMore, observerItem, {
+                          rootMargin: '0px 0px -160px 0px',
+                        })
+                    : null
+                }
               >
                 <div className='item-select'>
                   <input type='radio' />
                   <div className='item__logo'>
                     <img
-                      ref={imagesObserveRef}
-                      src={noLogo}
+                      ref={(e) =>
+                        observerEvent(e, lazyLoadImage, observerImage, {
+                          rootMargin: '0px 0px 160px 0px',
+                        })
+                      }
                       data-src={item.logo || noLogo}
                       alt='brand-logo'
                     />
@@ -299,7 +350,7 @@ const BrandList = () => {
                     </span>
                     <div className='item-details__info__description'>
                       <span>{item.desc || '--'}</span>
-                      <span>{item.model?.length} Models</span>
+                      <span>{item.model?.length || 0} Models</span>
                     </div>
                   </div>
                   <div className='item-details__updated-time'>
@@ -351,7 +402,6 @@ const BrandList = () => {
         isDelete={isDelete}
         brandDetails={brandDetails}
         debouncedChangeHandler={debouncedChangeHandler}
-        onChangeLogo={onChangeLogo}
       />
     </>
   );

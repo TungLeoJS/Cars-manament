@@ -6,16 +6,15 @@ import { initializeApp } from 'firebase/app';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: 'AIzaSyBlsEgWcg5teWaxh9g7jrCv9If1VYuoACo',
-  authDomain: 'fetch-cars-management.firebaseapp.com',
-  projectId: 'fetch-cars-management',
-  storageBucket: 'fetch-cars-management.appspot.com',
-  messagingSenderId: '96597308595',
-  appId: '1:96597308595:web:fba5eb75bac5e20398ecc6',
-  measurementId: 'G-0ZCJKHHSN1',
+  apiKey: 'AIzaSyDBFmuM_c7drAofspJsPYG5KpUzCKTFIvQ',
+  authDomain: 'test-performance-2.firebaseapp.com',
+  projectId: 'test-performance-2',
+  storageBucket: 'test-performance-2.appspot.com',
+  messagingSenderId: '782278607091',
+  appId: '1:782278607091:web:d963a3b97e5ad2c12cb786',
+  measurementId: 'G-3H8C75T7TH',
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
 export default app;

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { publicRequest } from 'api/publicRequest';
+import { publicRequest } from 'src/api/publicRequest';
 import { useParams, useNavigate } from 'react-router-dom';
 import Backdrop from 'components/Backdrop/Backdrop';
-import noLogo from 'assets/images/brandLogos/no-logo.png';
+import noLogo from 'src/assets/images/brandLogos/no-logo.png';
 
 import './style.scss';
 

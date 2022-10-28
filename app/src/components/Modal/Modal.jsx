@@ -1,12 +1,7 @@
 /* eslint-disable no-console */
-import React, { useEffect, useRef } from 'react';
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from 'firebase/storage';
-import app from '../../firebase';
+import React, { useEffect, useRef, useState } from 'react';
+import noLogo from 'src/assets/images/brandLogos/no-logo.png';
+
 import './styles.scss';
 
 const Modal = ({
@@ -16,9 +11,10 @@ const Modal = ({
   debouncedChangeHandler,
   brandDetails,
   isEdit,
-  onChangeLogo,
   isDelete,
 }) => {
+  const [file, setFile] = useState(null);
+
   const inputNameRef = useRef({ value: '' });
   const inputDescRef = useRef({ value: '' });
   const inputStatusRef = useRef({ value: '' });
@@ -29,54 +25,22 @@ const Modal = ({
       if (
         inputNameRef.current &&
         inputDescRef.current &&
-        inputStatusRef.current &&
-        logoRef.current
+        inputStatusRef.current
       ) {
         inputNameRef.current.value = brandDetails.name || '';
         inputDescRef.current.value = brandDetails.desc || '';
         inputStatusRef.current.value = brandDetails.isActive || false;
-        logoRef.current.value = brandDetails.logo || '';
       }
     }
   }, [brandDetails]);
 
-  const onChangeFileUpload = (e) => {
-    e.preventDefault();
-    const file = e.target.files[0];
-    const fileName = new Date().getTime() + file.name;
-    const storage = getStorage(app);
-    const storageRef = ref(storage, fileName);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
-        switch (snapshot.state) {
-          case 'paused':
-            console.log('Upload is paused');
-            break;
-          case 'running':
-            console.log('Upload is running');
-            break;
-          default:
-            break;
-        }
-      },
-      (error) => {
-        throw error;
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          onChangeLogo({
-            name: 'logo',
-            value: downloadURL,
-          });
-        });
-      }
-    );
+  const onChangeLogoFile = async (e) => {
+    setFile(e.target.files[0]);
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(e.target.files[0]);
+    fileReader.onload = () => {
+      logoRef.current.src = fileReader.result;
+    };
   };
 
   const renderDeleteModal = () => {
@@ -131,30 +95,21 @@ const Modal = ({
         <div className='modal-main'>
           <div className='brand-logo'>
             <div className='brand-logo__title'>Brand Logo</div>
-            {brandDetails?.logo ? (
-              <div className='brand-logo__images'>
-                <img src={brandDetails.logo} alt='brand-logo' />
-                <input
-                  id='logo'
-                  name='logo'
-                  className='inputFile'
-                  type='file'
-                  onChange={(e) => onChangeFileUpload(e)}
-                />
-                <label htmlFor='logo'>Upload file</label>
-              </div>
-            ) : (
-              <div className='brand-logo__add'>
-                <i className='fa-solid fa-plus'></i>
-                <span>Brand Logo</span>
-                <input
-                  name='logo'
-                  className='inputFile'
-                  type='file'
-                  onChange={(e) => onChangeFileUpload(e)}
-                />
-              </div>
-            )}
+            <div className='brand-logo__images'>
+              <img
+                ref={logoRef}
+                src={brandDetails?.logo || noLogo}
+                alt='brand-logo'
+              />
+              <input
+                id='logo'
+                name='logo'
+                className='inputFile'
+                type='file'
+                onChange={(e) => onChangeLogoFile(e)}
+              />
+              <label htmlFor='logo'>Upload file</label>
+            </div>
           </div>
           <div className='brand-details__title'>Brand Details</div>
           <div className='brand-details__content'>
@@ -206,7 +161,7 @@ const Modal = ({
               Cancel
             </div>
             <div
-              onClick={onSubmit}
+              onClick={() => onSubmit(file)}
               className='modal-actions__create button button--primary'
             >
               {isEdit ? 'Update Brand' : 'Create Brand'}
