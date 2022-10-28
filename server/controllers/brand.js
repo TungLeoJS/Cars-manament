@@ -80,12 +80,23 @@ exports.getAll = async (req, res) => {
             }
         }
 
-        const lastItem = await Brand.findOne({}, {}, { sort: { createdAt: -1 } });
-        const isNextPageExist = lastIndexId !== lastItem._id.toString()
+        const lastItem = await Brand.findOne(
+            {},
+            {},
+            { sort: { createdAt: -1 } }
+        );
+        lastId =
+            brand.length > 0
+                ? brand[brand.length - 1]._id.toString()
+                : lastIndexId;
+        const isNextPageExist = lastItem
+            ? lastId !== lastItem?._id.toString()
+            : false;
 
         res.status(200).json({
             list: brand,
             isNextPageExist,
+            lastIndexId: lastId,
         });
     } catch (err) {
         res.status(500).json(err);
