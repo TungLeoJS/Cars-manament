@@ -9,6 +9,7 @@ services:
     ports:
       - 27017:27017
   client:
+    image: node:16
     container_name: client
     build:
       context: ./app
@@ -19,10 +20,16 @@ services:
       - server
     environment:
       - REACT_APP_BASE_URL_DEVELOPMENT=http://127.0.0.1:5000/api/v1
-    command: yarn start
-    stdin_open: true
+      - ESLINT_NO_DEV_ERRORS=true
     tty: true
+    stdin_open: true
+    working_dir: /usr/src/cars-management/app
+    volumes:
+      - ./app:/usr/src/cars-management/app
+    restart: always
+    command: yarn serve
   server:
+    image: node:16
     container_name: server
     build:
       context: ./server
@@ -33,5 +40,10 @@ services:
       - db
     environment:
       - MONGO_URL=mongodb://mongo:27017/cars-managements
-      - CLIENT=http://127.0.0.1:3000
+    working_dir: /usr/src/cars-management/server
+    volumes:
+      - ./server:/usr/src/cars-management/server
+    restart: always
+    tty: true
+    stdin_open: true
     command: yarn start

@@ -19,9 +19,10 @@
     "sourceType": "module"
   },
   "plugins": ["react", "prettier"],
+  "ignorePatterns": ["/build"],
   "rules": {
     "prettier/prettier": [
-      "error",
+      "warn",
       {},
       {
         "usePrettierrc": true
@@ -37,6 +38,8 @@
     "no-var": 2,
     "no-unused-vars": 2,
     "func-names": 0,
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "no-useless-catch": 0,
+    "react/react-in-jsx-scope": 0
   }
 }
