@@ -14,12 +14,13 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "serve": "webpack-dev-server --mode development",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .jsx src/",
     "lint:fix": "eslint --ext .jsx --fix",
     "pretest": "eslint --ext .jsx app/src/",
-    "serve": "webpack-dev-server --mode development --open --hot",
+    "dev": "webpack-dev-server --mode development --open --hot",
     "build": "webpack --mode production"
   },
   "eslintConfig": {
