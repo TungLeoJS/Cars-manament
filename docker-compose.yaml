@@ -12,10 +12,8 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=$DB_PASSWORD
     ports:
       - $MONGO_LOCAL_PORT:$MONGO_DOCKER_PORT
-    volumes:
-      - 'db:/data/db'
     networks:
-      - backend
+      - cars-management-network
   client:
     container_name: client
     restart: unless-stopped
@@ -33,7 +31,7 @@ services:
     tty: true
     stdin_open: true
     networks:
-      - frontend
+      - cars-management-network
     command: yarn prod
   server: 
     container_name: server
@@ -52,15 +50,11 @@ services:
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_PASSWORD
     networks:
-      - backend
-      - frontend
+      - cars-management-network
     tty: true
     stdin_open: true
     command: yarn start
 
-volumes: 
-  db:
-
 networks:
-  backend:
-  frontend:
+  cars-management-network:
+    driver: bridge
