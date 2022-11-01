@@ -21,7 +21,7 @@
     "lint:fix": "eslint --ext .jsx --fix",
     "pretest": "eslint --ext .jsx app/src/",
     "dev": "webpack-dev-server --mode development --open --hot",
-    "build": "webpack --mode production"
+    "prod": "webpack-dev-server --mode production"
   },
   "eslintConfig": {
     "extends": [

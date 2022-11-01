@@ -68,4 +68,9 @@ module.exports = {
       components: path.resolve(__dirname, './src/components'),
     },
   },
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
+  },
 };

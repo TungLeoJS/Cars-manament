@@ -2,48 +2,65 @@
 version: '3'
 
 services:
-  db:
+  mongodb:
     container_name: mongo
     image: mongo
-    restart: always
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$DB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$DB_PASSWORD
     ports:
-      - 27017:27017
+      - $MONGO_LOCAL_PORT:$MONGO_DOCKER_PORT
+    volumes:
+      - 'db:/data/db'
+    networks:
+      - backend
   client:
-    image: node:16
     container_name: client
+    restart: unless-stopped
     build:
       context: ./app
       dockerfile: Dockerfile
+    env_file: ./.env
+    environment:
+      - REACT_APP_API_BASE_URL=http://server:$NODE_DOCKER_PORT/api/v1
+      - ESLINT_NO_DEV_ERRORS=true
     ports:
-      - 3000:3000
+      - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
     depends_on:
       - server
-    environment:
-      - REACT_APP_BASE_URL_DEVELOPMENT=http://127.0.0.1:5000/api/v1
-      - ESLINT_NO_DEV_ERRORS=true
     tty: true
     stdin_open: true
-    working_dir: /usr/src/cars-management/app
-    volumes:
-      - ./app:/usr/src/cars-management/app
-    restart: always
-    command: yarn serve
-  server:
-    image: node:16
+    networks:
+      - frontend
+    command: yarn prod
+  server: 
     container_name: server
+    restart: unless-stopped
     build:
       context: ./server
       dockerfile: Dockerfile
+    env_file: ./.env
     ports:
-      - 5000:5000
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
     depends_on:
-      - db
+      - mongodb
     environment:
-      - MONGO_URL=mongodb://mongo:27017/cars-managements
-    working_dir: /usr/src/cars-management/server
-    volumes:
-      - ./server:/usr/src/cars-management/server
-    restart: always
+      - DB_HOST=mongo
+      - DB_NAME=$DB_NAME
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+    networks:
+      - backend
+      - frontend
     tty: true
     stdin_open: true
     command: yarn start
+
+volumes: 
+  db:
+
+networks:
+  backend:
+  frontend:
