@@ -3,9 +3,8 @@ version: '3'
 
 services:
   mongodb:
-    container_name: mongo
     image: mongo
-    restart: unless-stopped
+    restart: always
     env_file: ./.env
     environment:
       - MONGO_INITDB_ROOT_USERNAME=$DB_USER
@@ -13,48 +12,47 @@ services:
     ports:
       - $MONGO_LOCAL_PORT:$MONGO_DOCKER_PORT
     networks:
-      - cars-management-network
+      - server
   client:
-    container_name: client
-    restart: unless-stopped
+    restart: always
     build:
       context: ./app
       dockerfile: Dockerfile
     env_file: ./.env
+    ports:
+      - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
+    networks:
+      - server
+    depends_on:
+      - server
     environment:
       - REACT_APP_API_BASE_URL=http://server:$NODE_DOCKER_PORT/api/v1
       - ESLINT_NO_DEV_ERRORS=true
-    ports:
-      - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
-    depends_on:
-      - server
     tty: true
     stdin_open: true
-    networks:
-      - cars-management-network
     command: yarn prod
   server: 
-    container_name: server
-    restart: unless-stopped
+    restart: always
     build:
       context: ./server
       dockerfile: Dockerfile
     env_file: ./.env
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    networks:
+      - client
+      - server
     depends_on:
       - mongodb
     environment:
-      - DB_HOST=mongo
+      - DB_HOST=mongodb
       - DB_NAME=$DB_NAME
       - DB_USER=$DB_USER
       - DB_PASSWORD=$DB_PASSWORD
-    networks:
-      - cars-management-network
     tty: true
     stdin_open: true
     command: yarn start
 
 networks:
-  cars-management-network:
-    driver: bridge
+  client:
+  server:
