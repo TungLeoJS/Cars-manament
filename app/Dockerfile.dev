@@ -8,8 +8,13 @@ RUN yarn
 
 COPY . .
 
-EXPOSE $REACT_LOCAL_PORT
+ARG API_URL
 
+ENV API_URL=$API_URL
+
+EXPOSE 8080
+
+CMD ["yarn", "dev"]
 #stage 2
 # FROM nginx:1.17.0-alpine
 

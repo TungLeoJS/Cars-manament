@@ -8,4 +8,4 @@ RUN yarn
 
 COPY . .
 
-EXPOSE $NODE_LOCAL_PORT
+CMD ["yarn", "start"]
