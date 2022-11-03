@@ -13,7 +13,7 @@ const {
   DB_PASSWORD,
   DB_NAME,
   DB_PORT,
-  NODE_LOCAL_PORT
+  NODE_DOCKER_PORT
 } = process.env;
 
 const MONGO_URL = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`;
@@ -37,8 +37,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/v1', require('./v1/routes/index'));
 
-app.listen(NODE_LOCAL_PORT, () => {
-    console.log(`Server is running on ${NODE_LOCAL_PORT || 5000}!`);
+app.listen(NODE_DOCKER_PORT, () => {
+    console.log(`Server is running on ${NODE_DOCKER_PORT || 5000}!`);
 });
 
 module.exports = app;

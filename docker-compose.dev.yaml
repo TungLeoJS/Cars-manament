@@ -36,12 +36,12 @@ services:
     restart: unless-stopped
     build:
       context: ./server
-      dockerfile: Dockerfile.dev
-    env_file: ./server/.env.dev
-    # ports:
-    #   - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-    # networks:
-    #   - cars-management
+      dockerfile: Dockerfile
+    env_file: ./server/.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    networks:
+      - cars-management
     depends_on:
       - mongodb
     environment:
