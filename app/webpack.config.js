@@ -50,7 +50,7 @@ module.exports = {
       template: './public/index.html', // to import index.html file inside index.js
     }),
     new webpack.DefinePlugin({
-      "process.env.API_URL": JSON.stringify(process.env.API_URL)
+      'process.env.API_URL': JSON.stringify(process.env.API_URL),
     }),
   ],
   devServer: {
@@ -58,6 +58,19 @@ module.exports = {
     open: true,
     compress: true,
     hot: true,
+    port: 8080,
+    proxy: {
+      '/api': {
+        target: {
+          host: 'server',
+          protocol: 'http',
+          port: 5000,
+          ignorePath: true,
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   },
   resolve: {
     extensions: ['.js', '.scss', '.jsx'],

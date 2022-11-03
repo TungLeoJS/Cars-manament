@@ -1,0 +1,17 @@
+FROM node:lts as build-stage
+
+WORKDIR /usr/src/cars-management/app
+
+COPY package.json .
+
+RUN yarn
+
+COPY . .
+
+ARG API_URL
+
+ENV API_URL=$API_URL
+
+EXPOSE 8080
+
+CMD ["yarn", "prod"]
