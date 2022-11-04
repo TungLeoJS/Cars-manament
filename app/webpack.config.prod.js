@@ -59,10 +59,10 @@ module.exports = {
     compress: true,
     hot: true,
     port: 8080,
+    host: '0.0.0.0',
     proxy: {
       '/api': {
         target: {
-          host: 'server',
           protocol: 'http',
           port: 5000,
           ignorePath: true,

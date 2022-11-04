@@ -11,19 +11,16 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=$DB_PASSWORD
     ports:
       - $MONGO_LOCAL_PORT:$MONGO_DOCKER_PORT
-    # networks:
-    #   - cars-management
+
   client:
     restart: unless-stopped
     build:
       context: ./app
       dockerfile: Dockerfile.dev
       args:
-        - API_URL=http://127.0.0.1:$SERVER_NGINX_PORT/api/v1
+        - API_URL=http://${HOST_IP_LOCAL}:$NODE_LOCAL_PORT/api/v1
     ports:
       - $REACT_LOCAL_PORT:$REACT_DOCKER_PORT
-    # networks: 
-    #   - cars-management
     depends_on:
       - server
     tty: true
@@ -32,6 +29,7 @@ services:
       - ./app:/usr/src/cars-management/app
       - /usr/src/cars-management/app/node_modules
     command: yarn dev
+
   server: 
     restart: unless-stopped
     build:
@@ -40,8 +38,6 @@ services:
     env_file: ./server/.env
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-    networks:
-      - cars-management
     depends_on:
       - mongodb
     environment:
@@ -52,15 +48,3 @@ services:
       - ./server:/usr/src/cars-management/server
       - /usr/src/cars-management/server/node_modules
     command: yarn start
-
-  proxy:
-    image: nginx:1.17
-    restart: unless-stopped
-    ports:
-      - $SERVER_NGINX_PORT:80
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-
-# networks:
-#   cars-management:
-#     driver: bridge
