@@ -18,3 +18,7 @@ ssh:
 
 copy-files:
 	scp -r ./* $(SSH_STRING):./
+
+### PULL
+pull-git:
+	cd cars-management && git pull
